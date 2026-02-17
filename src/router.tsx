@@ -8,6 +8,9 @@ import { createBrowserRouter, Navigate } from 'react-router-dom';
 // Layouts
 import MainLayout from '@/components/layouts/MainLayout';
 
+// Auth Components
+import ProtectedRoute from '@/components/auth/ProtectedRoute';
+
 // Pages
 import LoginPage from '@/pages/Login';
 import DashboardPage from '@/pages/Dashboard';
@@ -22,16 +25,13 @@ import NotFoundPage from '@/pages/NotFound';
  *
  * Route Structure:
  * - /login - Public authentication page
- * - / - Redirect to dashboard
- * - /dashboard - Main dashboard (protected)
- * - /payment-plans - Payment plans list (protected, admin)
- * - /invoices - Invoices list (protected)
- * - /transactions - Transaction history (protected)
- * - /payment-portal - Student payment portal (protected, student)
- * - * - 404 Not Found page
- *
- * TODO: Add authentication guards in PAYMENT-020
- * TODO: Add role-based route protection (admin/student)
+ * - / - Protected: Redirect to dashboard (requires authentication)
+ * - /dashboard - Protected: Main dashboard (any authenticated user)
+ * - /payment-plans - Protected: Payment plans list (admin only)
+ * - /invoices - Protected: Invoices list (any authenticated user)
+ * - /transactions - Protected: Transaction history (any authenticated user)
+ * - /payment-portal - Protected: Student payment portal (student only)
+ * - * - Public: 404 Not Found page
  */
 export const router = createBrowserRouter([
   {
@@ -40,7 +40,11 @@ export const router = createBrowserRouter([
   },
   {
     path: '/',
-    element: <MainLayout />,
+    element: (
+      <ProtectedRoute>
+        <MainLayout />
+      </ProtectedRoute>
+    ),
     children: [
       {
         index: true,
@@ -52,7 +56,11 @@ export const router = createBrowserRouter([
       },
       {
         path: 'payment-plans',
-        element: <PaymentPlansPage />,
+        element: (
+          <ProtectedRoute requiredRole="admin">
+            <PaymentPlansPage />
+          </ProtectedRoute>
+        ),
       },
       {
         path: 'invoices',
@@ -64,7 +72,11 @@ export const router = createBrowserRouter([
       },
       {
         path: 'payment-portal',
-        element: <PaymentPortalPage />,
+        element: (
+          <ProtectedRoute requiredRole="student">
+            <PaymentPortalPage />
+          </ProtectedRoute>
+        ),
       },
     ],
   },

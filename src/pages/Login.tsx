@@ -3,6 +3,7 @@
  * Handles user authentication (admin and student login)
  */
 
+import { useState, useEffect } from 'react';
 import {
   Card,
   CardHeader,
@@ -12,13 +13,38 @@ import {
 } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { useNavigate } from 'react-router-dom';
+import { useAuth } from '@/context/AuthContext';
+import { Spinner } from '@/components/ui/spinner';
+import { commonToasts } from '@/lib/toastUtils';
 
 export default function LoginPage() {
   const navigate = useNavigate();
+  const { login, isAuthenticated } = useAuth();
 
-  const handleLogin = () => {
-    // TODO: Implement actual login logic in PAYMENT-020
-    navigate('/dashboard');
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
+
+  // Redirect if already authenticated
+  useEffect(() => {
+    if (isAuthenticated) {
+      navigate('/dashboard');
+    }
+  }, [isAuthenticated, navigate]);
+
+  const handleLogin = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setIsLoading(true);
+
+    try {
+      await login({ email, password });
+      commonToasts.loginSuccess();
+      navigate('/dashboard');
+    } catch (err: any) {
+      commonToasts.loginError(err.response?.data?.error);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -29,13 +55,17 @@ export default function LoginPage() {
           <CardDescription>Sign in to your account to continue</CardDescription>
         </CardHeader>
         <CardContent>
-          <div className="space-y-4">
+          <form onSubmit={handleLogin} className="space-y-4">
             <div>
               <label className="block text-sm font-medium mb-2">Email</label>
               <input
                 type="email"
                 placeholder="Enter your email"
                 className="w-full px-3 py-2 border rounded-md"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                required
+                disabled={isLoading}
               />
             </div>
             <div>
@@ -44,12 +74,23 @@ export default function LoginPage() {
                 type="password"
                 placeholder="Enter your password"
                 className="w-full px-3 py-2 border rounded-md"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                required
+                disabled={isLoading}
               />
             </div>
-            <Button onClick={handleLogin} className="w-full">
-              Sign In
+            <Button type="submit" className="w-full" disabled={isLoading}>
+              {isLoading ? (
+                <span className="flex items-center justify-center gap-2">
+                  <Spinner size="sm" />
+                  Signing in...
+                </span>
+              ) : (
+                'Sign In'
+              )}
             </Button>
-          </div>
+          </form>
         </CardContent>
       </Card>
     </div>

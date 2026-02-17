@@ -5,12 +5,16 @@
 
 import { Outlet, useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
+import { useAuth } from '@/context/AuthContext';
+import { commonToasts } from '@/lib/toastUtils';
 
 export default function MainLayout() {
   const navigate = useNavigate();
+  const { logout, user } = useAuth();
 
   const handleLogout = () => {
-    // TODO: Implement actual logout logic in PAYMENT-020
+    commonToasts.logoutSuccess();
+    logout();
     navigate('/login');
   };
 
@@ -50,9 +54,16 @@ export default function MainLayout() {
               </Button>
             </nav>
           </div>
-          <Button variant="outline" onClick={handleLogout}>
-            Logout
-          </Button>
+          <div className="flex items-center space-x-4">
+            {user && (
+              <span className="text-sm text-gray-600">
+                {user.first_name} {user.last_name} ({user.role})
+              </span>
+            )}
+            <Button variant="outline" onClick={handleLogout}>
+              Logout
+            </Button>
+          </div>
         </div>
       </header>
 
