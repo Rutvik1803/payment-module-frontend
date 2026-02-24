@@ -19,6 +19,13 @@ export interface PaymentPlan {
     end_date?: string;
     created_at: string;
     updated_at: string;
+    user?: {
+        id: number;
+        email: string;
+        first_name: string;
+        last_name: string;
+        role: string;
+    };
 }
 
 export interface CreatePaymentPlanDTO {

@@ -7,6 +7,9 @@ import { useState, useCallback } from 'react';
 import { Button } from '@/components/ui/button';
 import { PaymentPlanForm } from '@/components/paymentPlan/PaymentPlanForm';
 import { PaymentSchedulePreview } from '@/components/paymentPlan/PaymentSchedulePreview';
+import { PaymentPlansList } from '@/components/paymentPlan/PaymentPlansList';
+import { PaymentPlanFilters } from '@/components/paymentPlan/PaymentPlanFilters';
+import { PaymentPlanStatus, PaymentPlanType } from '@/types/paymentPlan';
 
 export default function PaymentPlansPage() {
   const [showForm, setShowForm] = useState(false);
@@ -16,6 +19,12 @@ export default function PaymentPlansPage() {
     number_of_installments: '',
     start_date: new Date().toISOString().split('T')[0],
   });
+
+  const [filters, setFilters] = useState<{
+    status?: PaymentPlanStatus;
+    type?: PaymentPlanType;
+    search?: string;
+  }>({});
 
   const handleFormSuccess = useCallback(() => {
     setShowForm(false);
@@ -29,20 +38,30 @@ export default function PaymentPlansPage() {
     setPreviewData(values);
   }, []);
 
-  if (!showForm) {
+  const handleFilterChange = useCallback(
+    (newFilters: Partial<typeof filters>) => {
+      setFilters((prev) => ({ ...prev, ...newFilters }));
+    },
+    [],
+  );
+
+  const handleClearFilters = useCallback(() => {
+    setFilters({});
+  }, []);
+
+  // Form View
+  if (showForm) {
     return (
       <div className="space-y-8">
         {/* Page Header */}
         <div className="flex justify-between items-center">
           <div className="space-y-2">
             <h1 className="text-4xl font-bold text-gray-900">Payment Plans</h1>
-            <p className="text-lg text-gray-600">
-              Create and manage payment plans for students
-            </p>
+            <p className="text-lg text-gray-600">Create a new payment plan</p>
           </div>
           <Button
-            size="lg"
-            onClick={() => setShowForm(true)}
+            variant="outline"
+            onClick={() => setShowForm(false)}
             className="flex items-center gap-2"
           >
             <svg
@@ -55,70 +74,75 @@ export default function PaymentPlansPage() {
                 strokeLinecap="round"
                 strokeLinejoin="round"
                 strokeWidth={2}
-                d="M12 6v6m0 0v6m0-6h6m-6 0H6"
+                d="M10 19l-7-7m0 0l7-7m-7 7h18"
               />
             </svg>
-            Create Payment Plan
+            Back to List
           </Button>
         </div>
 
-        {/* Payment Plans List - Placeholder */}
-        <div className="bg-white border rounded-lg p-12">
-          <div className="text-center space-y-4">
-            <div className="w-20 h-20 bg-blue-100 rounded-full flex items-center justify-center mx-auto">
-              <svg
-                className="w-10 h-10 text-blue-600"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
-                />
-              </svg>
-            </div>
-            <h3 className="text-2xl font-bold text-gray-900">
-              No Payment Plans Yet
-            </h3>
-            <p className="text-gray-600 max-w-md mx-auto">
-              Get started by creating your first payment plan. Click the "Create
-              Payment Plan" button above.
-            </p>
+        {/* Form and Preview Layout */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          {/* Form */}
+          <div>
+            <PaymentPlanForm
+              onSuccess={handleFormSuccess}
+              onCancel={handleCancel}
+              onFormChange={handleFormChange}
+            />
+          </div>
+
+          {/* Preview */}
+          <div className="lg:sticky lg:top-8 h-fit">
+            <PaymentSchedulePreview {...previewData} />
           </div>
         </div>
       </div>
     );
   }
 
+  // List View
   return (
-    <div className="space-y-8">
+    <div className="space-y-6">
       {/* Page Header */}
-      <div className="space-y-2">
-        <h1 className="text-4xl font-bold text-gray-900">Payment Plans</h1>
-        <p className="text-lg text-gray-600">
-          Create and manage payment plans for students
-        </p>
+      <div className="flex justify-between items-center">
+        <div className="space-y-2">
+          <h1 className="text-4xl font-bold text-gray-900">Payment Plans</h1>
+          <p className="text-lg text-gray-600">
+            Create and manage payment plans for students
+          </p>
+        </div>
+        <Button
+          size="lg"
+          onClick={() => setShowForm(true)}
+          className="flex items-center gap-2"
+        >
+          <svg
+            className="w-5 h-5"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={2}
+              d="M12 6v6m0 0v6m0-6h6m-6 0H6"
+            />
+          </svg>
+          Create Payment Plan
+        </Button>
       </div>
 
-      {/* Form and Preview Layout */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {/* Form */}
-        <div>
-          <PaymentPlanForm
-            onSuccess={handleFormSuccess}
-            onCancel={handleCancel}
-            onFormChange={handleFormChange}
-          />
-        </div>
+      {/* Filters */}
+      <PaymentPlanFilters
+        filters={filters}
+        onFilterChange={handleFilterChange}
+        onClearFilters={handleClearFilters}
+      />
 
-        {/* Preview */}
-        <div className="lg:sticky lg:top-8 h-fit">
-          <PaymentSchedulePreview {...previewData} />
-        </div>
-      </div>
+      {/* Payment Plans List */}
+      <PaymentPlansList filters={filters} />
     </div>
   );
 }
