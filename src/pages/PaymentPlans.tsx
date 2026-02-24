@@ -3,54 +3,67 @@
  * List and manage payment plans
  */
 
-import {
-  Card,
-  CardHeader,
-  CardTitle,
-  CardDescription,
-} from '@/components/ui/card';
+import { useState, useCallback } from 'react';
+import { Button } from '@/components/ui/button';
+import { PaymentPlanForm } from '@/components/paymentPlan/PaymentPlanForm';
+import { PaymentSchedulePreview } from '@/components/paymentPlan/PaymentSchedulePreview';
 
 export default function PaymentPlansPage() {
-  return (
-    <div className="space-y-8">
-      {/* Page Header */}
-      <div className="space-y-2">
-        <h1 className="text-4xl font-bold text-gray-900">Payment Plans</h1>
-        <p className="text-lg text-gray-600">
-          Create and manage payment plans for students
-        </p>
-      </div>
+  const [showForm, setShowForm] = useState(false);
+  const [previewData, setPreviewData] = useState({
+    type: 'ONE_TIME',
+    total_amount: '',
+    number_of_installments: '',
+    start_date: new Date().toISOString().split('T')[0],
+  });
 
-      {/* Main Content Card */}
-      <Card className="shadow-lg border-0">
-        <CardHeader className="bg-gradient-to-r from-blue-50 to-indigo-50 border-b">
-          <div className="flex items-center space-x-4">
-            <div className="w-12 h-12 bg-blue-600 rounded-lg flex items-center justify-center shadow-md">
-              <svg
-                className="w-6 h-6 text-white"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
-                />
-              </svg>
-            </div>
-            <div>
-              <CardTitle className="text-2xl">
-                Payment Plans Management
-              </CardTitle>
-              <CardDescription className="text-base mt-1">
-                Configure flexible payment options for students
-              </CardDescription>
-            </div>
+  const handleFormSuccess = useCallback(() => {
+    setShowForm(false);
+  }, []);
+
+  const handleCancel = useCallback(() => {
+    setShowForm(false);
+  }, []);
+
+  const handleFormChange = useCallback((values: any) => {
+    setPreviewData(values);
+  }, []);
+
+  if (!showForm) {
+    return (
+      <div className="space-y-8">
+        {/* Page Header */}
+        <div className="flex justify-between items-center">
+          <div className="space-y-2">
+            <h1 className="text-4xl font-bold text-gray-900">Payment Plans</h1>
+            <p className="text-lg text-gray-600">
+              Create and manage payment plans for students
+            </p>
           </div>
-        </CardHeader>
-        <div className="p-12">
+          <Button
+            size="lg"
+            onClick={() => setShowForm(true)}
+            className="flex items-center gap-2"
+          >
+            <svg
+              className="w-5 h-5"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M12 6v6m0 0v6m0-6h6m-6 0H6"
+              />
+            </svg>
+            Create Payment Plan
+          </Button>
+        </div>
+
+        {/* Payment Plans List - Placeholder */}
+        <div className="bg-white border rounded-lg p-12">
           <div className="text-center space-y-4">
             <div className="w-20 h-20 bg-blue-100 rounded-full flex items-center justify-center mx-auto">
               <svg
@@ -63,19 +76,49 @@ export default function PaymentPlansPage() {
                   strokeLinecap="round"
                   strokeLinejoin="round"
                   strokeWidth={2}
-                  d="M12 6v6m0 0v6m0-6h6m-6 0H6"
+                  d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
                 />
               </svg>
             </div>
-            <h3 className="text-2xl font-bold text-gray-900">Coming Soon</h3>
+            <h3 className="text-2xl font-bold text-gray-900">
+              No Payment Plans Yet
+            </h3>
             <p className="text-gray-600 max-w-md mx-auto">
-              This feature will be available in Sprint 2. You'll be able to
-              create customized payment plans, set installment schedules, and
-              manage student payment options.
+              Get started by creating your first payment plan. Click the "Create
+              Payment Plan" button above.
             </p>
           </div>
         </div>
-      </Card>
+      </div>
+    );
+  }
+
+  return (
+    <div className="space-y-8">
+      {/* Page Header */}
+      <div className="space-y-2">
+        <h1 className="text-4xl font-bold text-gray-900">Payment Plans</h1>
+        <p className="text-lg text-gray-600">
+          Create and manage payment plans for students
+        </p>
+      </div>
+
+      {/* Form and Preview Layout */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        {/* Form */}
+        <div>
+          <PaymentPlanForm
+            onSuccess={handleFormSuccess}
+            onCancel={handleCancel}
+            onFormChange={handleFormChange}
+          />
+        </div>
+
+        {/* Preview */}
+        <div className="lg:sticky lg:top-8 h-fit">
+          <PaymentSchedulePreview {...previewData} />
+        </div>
+      </div>
     </div>
   );
 }

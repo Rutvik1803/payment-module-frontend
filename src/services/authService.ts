@@ -48,7 +48,7 @@ export const setStoredUser = (user: User): void => {
  * Login user
  */
 export const login = async (credentials: LoginDTO): Promise<AuthResponse> => {
-    const response = await api.post<{ success: boolean; data: AuthResponse }>('/auth/login', credentials);
+    const response = await api.post<{ success: boolean; data: AuthResponse }>('api/auth/login', credentials);
 
     const { user, token } = response.data.data;
 
@@ -63,7 +63,7 @@ export const login = async (credentials: LoginDTO): Promise<AuthResponse> => {
  * Register new user
  */
 export const register = async (userData: RegisterDTO): Promise<AuthResponse> => {
-    const response = await api.post<{ success: boolean; data: AuthResponse }>('/auth/register', userData);
+    const response = await api.post<{ success: boolean; data: AuthResponse }>('api/auth/register', userData);
 
     const { user, token } = response.data.data;
 
@@ -78,7 +78,7 @@ export const register = async (userData: RegisterDTO): Promise<AuthResponse> => 
  * Get current authenticated user
  */
 export const getCurrentUser = async (): Promise<User> => {
-    const response = await api.get<{ success: boolean; data: { user: User } }>('/auth/me');
+    const response = await api.get<{ success: boolean; data: { user: User } }>('api/auth/me');
 
     const user = response.data.data.user;
 
