@@ -1,7 +1,9 @@
+import { useState, useEffect } from 'react';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select } from '@/components/ui/select';
 import { Button } from '@/components/ui/button';
+import { useDebounce } from '@/hooks/useDebounce';
 import { PaymentPlanStatus, PaymentPlanType } from '@/types/paymentPlan';
 
 interface PaymentPlanFiltersProps {
@@ -25,7 +27,25 @@ export function PaymentPlanFilters({
   onFilterChange,
   onClearFilters,
 }: PaymentPlanFiltersProps) {
+  // Local state for search input
+  const [searchValue, setSearchValue] = useState(filters.search || '');
+
+  // Debounce the search value - wait 500ms after user stops typing
+  const debouncedSearchValue = useDebounce(searchValue, 500);
+
   const hasActiveFilters = filters.status || filters.type || filters.search;
+
+  // Trigger filter change when debounced value changes
+  useEffect(() => {
+    onFilterChange({ search: debouncedSearchValue || undefined });
+  }, [debouncedSearchValue]);
+
+  // Update local search value when filters are cleared
+  useEffect(() => {
+    if (!filters.search) {
+      setSearchValue('');
+    }
+  }, [filters.search]);
 
   return (
     <div className="bg-white border rounded-lg p-4 space-y-4">
@@ -51,8 +71,8 @@ export function PaymentPlanFilters({
             id="search"
             type="text"
             placeholder="Search by name..."
-            value={filters.search || ''}
-            onChange={(e) => onFilterChange({ search: e.target.value })}
+            value={searchValue}
+            onChange={(e) => setSearchValue(e.target.value)}
           />
         </div>
 

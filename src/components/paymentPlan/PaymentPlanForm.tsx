@@ -8,7 +8,7 @@ import { Label } from '@/components/ui/label';
 import { Select } from '@/components/ui/select';
 import { DatePicker } from '@/components/ui/date-picker';
 import { Card } from '@/components/ui/card';
-import { Spinner } from '@/components/ui/spinner';
+import { CardLoadingSpinner, InlineSpinner } from '@/components/common/LoadingSpinner';
 import { paymentPlanFormSchema } from '@/lib/validations/paymentPlan';
 import { createPaymentPlan } from '@/services/paymentPlanService';
 import { getAllStudents } from '@/services/userService';
@@ -118,16 +118,7 @@ export function PaymentPlanForm({
   };
 
   if (loadingStudents) {
-    return (
-      <Card className="p-8">
-        <div className="flex items-center justify-center">
-          <Spinner className="h-8 w-8" />
-          <span className="ml-3 text-sm text-muted-foreground">
-            Loading form...
-          </span>
-        </div>
-      </Card>
-    );
+    return <CardLoadingSpinner message="Loading form..." />;
   }
 
   return (
@@ -261,10 +252,10 @@ export function PaymentPlanForm({
         <div className="flex gap-3 pt-4">
           <Button type="submit" disabled={submitting} className="flex-1">
             {submitting ? (
-              <>
-                <Spinner className="h-4 w-4 mr-2" />
-                Creating...
-              </>
+              <span className="flex items-center">
+                <InlineSpinner size="sm" />
+                <span className="ml-2">Creating...</span>
+              </span>
             ) : (
               'Create Payment Plan'
             )}

@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Spinner } from '@/components/ui/spinner';
+import { TableLoadingSpinner } from '@/components/common/LoadingSpinner';
 import { Button } from '@/components/ui/button';
 import { PaymentPlanCard } from './PaymentPlanCard';
 import { PaymentPlanStatusBadge } from './PaymentPlanStatusBadge';
@@ -52,14 +52,7 @@ export function PaymentPlansList({
 
   // Loading State
   if (isLoading) {
-    return (
-      <div className="bg-white border rounded-lg p-12">
-        <div className="flex flex-col items-center justify-center">
-          <Spinner className="h-8 w-8" />
-          <p className="mt-3 text-sm text-gray-600">Loading payment plans...</p>
-        </div>
-      </div>
-    );
+    return <TableLoadingSpinner message="Loading payment plans..." />;
   }
 
   // Error State
