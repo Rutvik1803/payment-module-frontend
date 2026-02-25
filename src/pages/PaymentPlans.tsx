@@ -40,7 +40,16 @@ export default function PaymentPlansPage() {
 
   const handleFilterChange = useCallback(
     (newFilters: Partial<typeof filters>) => {
-      setFilters((prev) => ({ ...prev, ...newFilters }));
+      setFilters((prev) => {
+        const updated = { ...prev, ...newFilters };
+        // Remove undefined values to ensure consistent object shape
+        Object.keys(updated).forEach((key) => {
+          if (updated[key as keyof typeof updated] === undefined) {
+            delete updated[key as keyof typeof updated];
+          }
+        });
+        return updated;
+      });
     },
     [],
   );

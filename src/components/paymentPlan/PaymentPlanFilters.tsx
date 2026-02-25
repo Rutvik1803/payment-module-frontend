@@ -36,9 +36,13 @@ export function PaymentPlanFilters({
   const hasActiveFilters = filters.status || filters.type || filters.search;
 
   // Trigger filter change when debounced value changes
+  // Only update if the value actually changed to avoid unnecessary updates
   useEffect(() => {
-    onFilterChange({ search: debouncedSearchValue || undefined });
-  }, [debouncedSearchValue]);
+    const newSearch = debouncedSearchValue || undefined;
+    if (newSearch !== filters.search) {
+      onFilterChange({ search: newSearch });
+    }
+  }, [debouncedSearchValue, filters.search, onFilterChange]);
 
   // Update local search value when filters are cleared
   useEffect(() => {

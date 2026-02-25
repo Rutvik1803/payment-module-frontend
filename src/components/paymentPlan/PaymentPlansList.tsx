@@ -23,11 +23,18 @@ export function PaymentPlansList({
   const [page, setPage] = useState(1);
   const [limit, setLimit] = useState(10);
 
-  const { plans, totalCount, isLoading, isError, cancelPlan, deletePlan } =
-    usePaymentPlans({
-      filters,
-      pagination: { page, limit },
-    });
+  const {
+    plans,
+    totalCount,
+    isLoading,
+    isError,
+    mutate,
+    cancelPlan,
+    deletePlan,
+  } = usePaymentPlans({
+    filters,
+    pagination: { page, limit },
+  });
 
   const formatCurrency = (amount: number) => {
     return new Intl.NumberFormat('en-US', {
@@ -128,24 +135,50 @@ export function PaymentPlansList({
           Showing {(page - 1) * limit + 1} to{' '}
           {Math.min(page * limit, totalCount)} of {totalCount} payment plans
         </p>
-        <div className="flex items-center gap-2">
-          <label htmlFor="limit" className="text-sm text-gray-600">
-            Per page:
-          </label>
-          <select
-            id="limit"
-            value={limit}
-            onChange={(e) => {
-              setLimit(Number(e.target.value));
-              setPage(1);
-            }}
-            className="text-sm border rounded px-2 py-1"
+        <div className="flex items-center gap-3">
+          {/* Refresh Button */}
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => mutate()}
+            className="flex items-center gap-2"
           >
-            <option value="10">10</option>
-            <option value="25">25</option>
-            <option value="50">50</option>
-            <option value="100">100</option>
-          </select>
+            <svg
+              className="w-4 h-4"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"
+              />
+            </svg>
+            Refresh
+          </Button>
+          
+          {/* Per Page Selector */}
+          <div className="flex items-center gap-2">
+            <label htmlFor="limit" className="text-sm text-gray-600">
+              Per page:
+            </label>
+            <select
+              id="limit"
+              value={limit}
+              onChange={(e) => {
+                setLimit(Number(e.target.value));
+                setPage(1);
+              }}
+              className="text-sm border rounded px-2 py-1"
+            >
+              <option value="10">10</option>
+              <option value="25">25</option>
+              <option value="50">50</option>
+              <option value="100">100</option>
+            </select>
+          </div>
         </div>
       </div>
 

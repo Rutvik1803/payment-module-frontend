@@ -50,17 +50,31 @@ export function usePaymentPlans(
 ): UsePaymentPlansReturn {
     const { filters = {}, pagination = { page: 1, limit: 10 } } = options;
 
-    // Build query params for SWR key
-    const queryParams = {
+    // Normalize filter values to ensure consistency
+    const status = filters.status || '';
+    const type = filters.type || '';
+    const search = filters.search || '';
+
+    // Build query params for API call (only include defined values)
+    const queryParams: Record<string, any> = {
         page: pagination.page,
         limit: pagination.limit,
-        ...(filters.status && { status: filters.status }),
-        ...(filters.type && { type: filters.type }),
-        ...(filters.search && { search: filters.search }),
     };
 
-    // SWR key includes all query params for proper cache invalidation
-    const swrKey = ['payment-plans', queryParams];
+    if (filters.status) queryParams.status = filters.status;
+    if (filters.type) queryParams.type = filters.type;
+    if (filters.search) queryParams.search = filters.search;
+
+    // SWR key uses stable array with primitive values for proper caching
+    // Each unique combination of filters creates a distinct cache entry
+    const swrKey = [
+        'payment-plans',
+        pagination.page,
+        pagination.limit,
+        status,
+        type,
+        search
+    ];
 
     // Fetcher function
     const fetcher = async () => {
@@ -74,9 +88,24 @@ export function usePaymentPlans(
         isLoading,
         mutate,
     } = useSWR(swrKey, fetcher, {
-        revalidateOnFocus: false,
-        revalidateOnReconnect: true,
-        dedupingInterval: 2000,
+        // Deduplication - prevent duplicate requests within this time
+        dedupingInterval: 5000, // 5 seconds - short window for duplicate prevention
+
+        // Cache freshness - data is considered fresh for this duration
+        // After this, it's "stale" and will auto-refetch on next mount/focus
+        revalidateIfStale: true, // Auto-revalidate stale data
+
+        // Network events
+        revalidateOnFocus: true, // Refetch when user returns to tab (catches new data!)
+        revalidateOnReconnect: true, // Refetch when internet reconnects
+
+        // Auto refresh every 30 seconds (optional - for real-time needs)
+        // refreshInterval: 30000, // Uncomment for polling every 30s
+
+        // Error handling
+        shouldRetryOnError: true,
+        errorRetryCount: 3,
+        errorRetryInterval: 5000,
     });
 
     /**
