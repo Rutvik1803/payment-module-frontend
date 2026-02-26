@@ -52,7 +52,7 @@ export function useInvoices(
         page: pagination.page,
         limit: pagination.limit,
     };
-    
+
     if (filters.status) queryParams.status = filters.status;
     if (filters.search) queryParams.search = filters.search;
 
@@ -83,11 +83,11 @@ export function useInvoices(
 
         // Cache freshness - data is considered fresh for this duration
         revalidateIfStale: true, // Auto-revalidate stale data
-        
+
         // Network events
         revalidateOnFocus: true, // Refetch when user returns to tab (catches new data!)
         revalidateOnReconnect: true, // Refetch when internet reconnects
-        
+
         // Error handling
         shouldRetryOnError: true,
         errorRetryCount: 3,

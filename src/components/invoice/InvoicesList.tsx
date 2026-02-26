@@ -24,10 +24,11 @@ export function InvoicesList({ filters, onViewDetails }: InvoicesListProps) {
   const [page, setPage] = useState(1);
   const [limit, setLimit] = useState(10);
 
-  const { invoices, totalCount, isLoading, isError, mutate, markAsPaid } = useInvoices({
-    filters,
-    pagination: { page, limit },
-  });
+  const { invoices, totalCount, isLoading, isError, mutate, markAsPaid } =
+    useInvoices({
+      filters,
+      pagination: { page, limit },
+    });
 
   const formatCurrency = (amount: string) => {
     return new Intl.NumberFormat('en-US', {
@@ -171,7 +172,7 @@ export function InvoicesList({ filters, onViewDetails }: InvoicesListProps) {
             </svg>
             Refresh
           </Button>
-          
+
           <span className="text-sm text-gray-600">Per page:</span>
           <Select
             value={limit.toString()}
