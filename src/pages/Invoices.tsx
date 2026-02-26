@@ -3,14 +3,44 @@
  * List and manage invoices
  */
 
+import { useState, useCallback } from 'react';
 import {
   Card,
   CardHeader,
   CardTitle,
   CardDescription,
+  CardContent,
 } from '@/components/ui/card';
+import { InvoiceFilters } from '@/components/invoice/InvoiceFilters';
+import { InvoicesList } from '@/components/invoice/InvoicesList';
+import { InvoiceStatus } from '@/types/invoice';
 
 export default function InvoicesPage() {
+  const [filters, setFilters] = useState<{
+    status?: InvoiceStatus;
+    search?: string;
+  }>({});
+
+  const handleFilterChange = useCallback(
+    (newFilters: Partial<typeof filters>) => {
+      setFilters((prev) => {
+        const updated = { ...prev, ...newFilters };
+        // Remove undefined values to ensure consistent object shape
+        Object.keys(updated).forEach((key) => {
+          if (updated[key as keyof typeof updated] === undefined) {
+            delete updated[key as keyof typeof updated];
+          }
+        });
+        return updated;
+      });
+    },
+    [],
+  );
+
+  const handleClearFilters = useCallback(() => {
+    setFilters({});
+  }, []);
+
   return (
     <div className="space-y-8">
       {/* Page Header */}
@@ -48,30 +78,19 @@ export default function InvoicesPage() {
             </div>
           </div>
         </CardHeader>
-        <div className="p-12">
-          <div className="text-center space-y-4">
-            <div className="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mx-auto">
-              <svg
-                className="w-10 h-10 text-green-600"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M12 6v6m0 0v6m0-6h6m-6 0H6"
-                />
-              </svg>
-            </div>
-            <h3 className="text-2xl font-bold text-gray-900">Coming Soon</h3>
-            <p className="text-gray-600 max-w-md mx-auto">
-              This feature will be available in Sprint 2. You'll be able to view
-              detailed invoices, download receipts, and track payment status.
-            </p>
+        <CardContent className="p-6">
+          {/* Filters */}
+          <div className="mb-6">
+            <InvoiceFilters
+              filters={filters}
+              onFilterChange={handleFilterChange}
+              onClearFilters={handleClearFilters}
+            />
           </div>
-        </div>
+
+          {/* Invoice List */}
+          <InvoicesList filters={filters} />
+        </CardContent>
       </Card>
     </div>
   );
