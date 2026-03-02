@@ -4,3 +4,4 @@
  */
 
 export { LoadingSpinner, InlineSpinner, TableLoadingSpinner, CardLoadingSpinner } from './LoadingSpinner';
+export { ErrorBoundary } from './ErrorBoundary';

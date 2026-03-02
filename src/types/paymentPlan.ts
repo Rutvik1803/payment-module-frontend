@@ -36,11 +36,19 @@ export interface CreatePaymentPlanDTO {
     start_date: string;
 }
 
+export type PaymentScheduleStatus = 'PENDING' | 'PAID' | 'OVERDUE' | 'CANCELLED';
+
 export interface PaymentSchedule {
+    id: number;
+    payment_plan_id: number;
     installment_number: number;
     due_date: string;
     amount: string;
-    status: 'UPCOMING' | 'PAID' | 'OVERDUE' | 'CANCELLED';
+    status: PaymentScheduleStatus;
+    paid_date?: string | null;
+    invoice_id?: number | null;
+    created_at: string;
+    updated_at: string;
 }
 
 export interface PaymentPlanWithSchedules extends PaymentPlan {

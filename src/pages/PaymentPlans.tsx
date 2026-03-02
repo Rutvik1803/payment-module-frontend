@@ -4,6 +4,7 @@
  */
 
 import { useState, useCallback } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { PaymentPlanForm } from '@/components/paymentPlan/PaymentPlanForm';
 import { PaymentSchedulePreview } from '@/components/paymentPlan/PaymentSchedulePreview';
@@ -12,6 +13,7 @@ import { PaymentPlanFilters } from '@/components/paymentPlan/PaymentPlanFilters'
 import { PaymentPlanStatus, PaymentPlanType } from '@/types/paymentPlan';
 
 export default function PaymentPlansPage() {
+  const navigate = useNavigate();
   const [showForm, setShowForm] = useState(false);
   const [previewData, setPreviewData] = useState({
     type: 'ONE_TIME',
@@ -57,6 +59,13 @@ export default function PaymentPlansPage() {
   const handleClearFilters = useCallback(() => {
     setFilters({});
   }, []);
+
+  const handleViewDetails = useCallback(
+    (id: number) => {
+      navigate(`/payment-plans/${id}`);
+    },
+    [navigate]
+  );
 
   // Form View
   if (showForm) {
@@ -151,7 +160,7 @@ export default function PaymentPlansPage() {
       />
 
       {/* Payment Plans List */}
-      <PaymentPlansList filters={filters} />
+      <PaymentPlansList filters={filters} onViewDetails={handleViewDetails} />
     </div>
   );
 }

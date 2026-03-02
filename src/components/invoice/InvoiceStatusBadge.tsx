@@ -42,7 +42,12 @@ export function InvoiceStatusBadge({
     },
   };
 
-  const config = statusConfig[status];
+  // Safeguard: fallback to a default config if status is invalid or undefined
+  const config = statusConfig[status as keyof typeof statusConfig] || {
+    label: status || 'Unknown',
+    className: 'bg-gray-100 text-gray-800 border-gray-200',
+    dotColor: 'bg-gray-500',
+  };
 
   return (
     <span

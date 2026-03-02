@@ -11,10 +11,14 @@ import MainLayout from '@/components/layouts/MainLayout';
 // Auth Components
 import ProtectedRoute from '@/components/auth/ProtectedRoute';
 
+// Common Components
+import { ErrorBoundary } from '@/components/common/ErrorBoundary';
+
 // Pages
 import LoginPage from '@/pages/Login';
 import DashboardPage from '@/pages/Dashboard';
 import PaymentPlansPage from '@/pages/PaymentPlans';
+import PaymentPlanDetailsPage from '@/pages/PaymentPlanDetails';
 import InvoicesPage from '@/pages/Invoices';
 import TransactionsPage from '@/pages/Transactions';
 import PaymentPortalPage from '@/pages/PaymentPortal';
@@ -37,6 +41,7 @@ export const router = createBrowserRouter([
   {
     path: '/login',
     element: <LoginPage />,
+    errorElement: <ErrorBoundary />,
   },
   {
     path: '/',
@@ -45,6 +50,7 @@ export const router = createBrowserRouter([
         <MainLayout />
       </ProtectedRoute>
     ),
+    errorElement: <ErrorBoundary />,
     children: [
       {
         index: true,
@@ -53,6 +59,7 @@ export const router = createBrowserRouter([
       {
         path: 'dashboard',
         element: <DashboardPage />,
+        errorElement: <ErrorBoundary />,
       },
       {
         path: 'payment-plans',
@@ -61,14 +68,26 @@ export const router = createBrowserRouter([
             <PaymentPlansPage />
           </ProtectedRoute>
         ),
+        errorElement: <ErrorBoundary />,
+      },
+      {
+        path: 'payment-plans/:id',
+        element: (
+          <ProtectedRoute requiredRole="admin">
+            <PaymentPlanDetailsPage />
+          </ProtectedRoute>
+        ),
+        errorElement: <ErrorBoundary />,
       },
       {
         path: 'invoices',
         element: <InvoicesPage />,
+        errorElement: <ErrorBoundary />,
       },
       {
         path: 'transactions',
         element: <TransactionsPage />,
+        errorElement: <ErrorBoundary />,
       },
       {
         path: 'payment-portal',
@@ -77,6 +96,7 @@ export const router = createBrowserRouter([
             <PaymentPortalPage />
           </ProtectedRoute>
         ),
+        errorElement: <ErrorBoundary />,
       },
     ],
   },

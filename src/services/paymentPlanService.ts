@@ -7,6 +7,7 @@ import api from './api';
 import {
     PaymentPlan,
     PaymentPlanWithSchedules,
+    PaymentSchedule,
     CreatePaymentPlanDTO,
 } from '@/types/paymentPlan';
 
@@ -65,10 +66,16 @@ export const getAllPaymentPlans = async (params?: {
 export const getPaymentPlanById = async (
     id: number
 ): Promise<PaymentPlanWithSchedules> => {
-    const response = await api.get<ApiResponse<PaymentPlanWithSchedules>>(
+    const response = await api.get<ApiResponse<{ plan: PaymentPlan; schedules: PaymentSchedule[] }>>(
         `/api/payment-plans/${id}`
     );
-    return response.data.data;
+    // API returns { plan: {...}, schedules: [...] }
+    // We need to merge them into a flat structure
+    const { plan, schedules } = response.data.data;
+    return {
+        ...plan,
+        schedules,
+    };
 };
 
 /**
